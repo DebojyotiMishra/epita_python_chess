@@ -1,1 +1,1 @@
-# epita-python-chess
+# Chess Game
