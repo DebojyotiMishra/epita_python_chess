@@ -119,4 +119,47 @@ class ChessboardFactory():
         return Chessboard()
     
     def create_chessboard_from_fen(self, fen: str) -> Chessboard:
-        pass
+        board = []
+        fen_parts = fen.split()
+        fen_board = fen_parts[0]
+        fen_rows = fen_board.split('/')
+        
+        for fen_row in fen_rows:
+            row = []
+            for char in fen_row:
+                if char.isdigit():
+                    for _ in range(int(char)):
+                        row.append(None)
+                else:
+                    piece = None
+                    if char.isupper():
+                        if char == 'R':
+                            piece = Rook("white")
+                        elif char == 'N':
+                            piece = Knight("white")
+                        elif char == 'B':
+                            piece = Bishop("white")
+                        elif char == 'Q':
+                            piece = Queen("white")
+                        elif char == 'K':
+                            piece = King("white")
+                        elif char == 'P':
+                            piece = Pawn("white")
+                    else:
+                        if char == 'r':
+                            piece = Rook("black")
+                        elif char == 'n':
+                            piece = Knight("black")
+                        elif char == 'b':
+                            piece = Bishop("black")
+                        elif char == 'q':
+                            piece = Queen("black")
+                        elif char == 'k':
+                            piece = King("black")
+                        elif char == 'p':
+                            piece = Pawn("black")
+                row.append(piece)
+            board.append(row)
+        
+        self.board = board
+
