@@ -21,7 +21,24 @@ class Pawn(ChessPiece):
 
     def get_possible_moves(self) -> List[Position]:
         # Implement the logic to calculate possible moves for a pawn
-        pass
+        possible_moves = []
+        if self.color == "white":
+            if self.y == 1:
+                # Move forward by 1 or 2 squares
+                possible_moves.append(Position(self.x, self.y + 1))
+                possible_moves.append(Position(self.x, self.y + 2))
+            else:
+                # Move forward by 1 square
+                possible_moves.append(Position(self.x, self.y + 1))
+        else:
+            if self.y == 6:
+                # Move forward by 1 or 2 squares
+                possible_moves.append(Position(self.x, self.y - 1))
+                possible_moves.append(Position(self.x, self.y - 2))
+            else:
+            # Move forward by 1 square
+                possible_moves.append(Position(self.x, self.y - 1))
+        return possible_moves
 
 class Rook(ChessPiece):
     def __str__(self) -> str:
