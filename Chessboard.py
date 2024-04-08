@@ -1,45 +1,70 @@
 from typing import List
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
 
-# class Position():
-#     x: int
-#     y: int
+class Position:
+    def __init__(self, x: int, y: int):
+        self.x = x
+        self.y = y
 
-@dataclass
-class Piece(ABC):
-    color: str
-    
-    @abstractmethod
+class ChessPiece:
+    def __init__(self, color: str):
+        self.color = color
+
     def __str__(self) -> str:
         pass
 
-class Pawn(Piece):
+    def get_possible_moves(self) -> List[Position]:
+        pass
+
+class Pawn(ChessPiece):
     def __str__(self) -> str:
         return "♙" if self.color == "white" else "♟"
 
-class Rook(Piece):
+    def get_possible_moves(self) -> List[Position]:
+        # Implement the logic to calculate possible moves for a pawn
+        pass
+
+class Rook(ChessPiece):
     def __str__(self) -> str:
         return "♖" if self.color == "white" else "♜"
 
-class Knight(Piece):
+    def get_possible_moves(self) -> List[Position]:
+        # Implement the logic to calculate possible moves for a rook
+        pass
+
+class Knight(ChessPiece):
     def __str__(self) -> str:
         return "♘" if self.color == "white" else "♞"
 
-class Bishop(Piece):
+    def get_possible_moves(self) -> List[Position]:
+        # Implement the logic to calculate possible moves for a knight
+        pass
+
+class Bishop(ChessPiece):
     def __str__(self) -> str:
         return "♗" if self.color == "white" else "♝"
 
-class Queen(Piece):
+    def get_possible_moves(self) -> List[Position]:
+        # Implement the logic to calculate possible moves for a bishop
+        pass
+
+class Queen(ChessPiece):
     def __str__(self) -> str:
         return "♕" if self.color == "white" else "♛"
 
-class King(Piece):
+    def get_possible_moves(self) -> List[Position]:
+        # Implement the logic to calculate possible moves for a queen
+        pass
+
+class King(ChessPiece):
     def __str__(self) -> str:
         return "♔" if self.color == "white" else "♚"
 
-class Game():
-    board: List[List[Piece]]
+    def get_possible_moves(self) -> List[Position]:
+        # Implement the logic to calculate possible moves for a king
+        pass
+
+class Game:
+    board: List[List[ChessPiece]]
     
     def __init__(self):
         Q = Queen
@@ -75,3 +100,4 @@ class Game():
 
 g = Game()
 g.print_board()
+
