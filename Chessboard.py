@@ -21,61 +21,14 @@ class Pawn(ChessPiece):
 
     def get_possible_moves(self) -> List[Position]:
         # Implement the logic to calculate possible moves for a pawn
-        possible_moves = []
-        if self.color == "white":
-            if self.y == 1:
-                # Move forward by 1 or 2 squares
-                possible_moves.append(Position(self.x, self.y + 1))
-                possible_moves.append(Position(self.x, self.y + 2))
-            else:
-                # Move forward by 1 square
-                possible_moves.append(Position(self.x, self.y + 1))
-        else:
-            if self.y == 6:
-                # Move forward by 1 or 2 squares
-                possible_moves.append(Position(self.x, self.y - 1))
-                possible_moves.append(Position(self.x, self.y - 2))
-            else:
-            # Move forward by 1 square
-                possible_moves.append(Position(self.x, self.y - 1))
-        return possible_moves
+        pass
 
 class Rook(ChessPiece):
     def __str__(self) -> str:
         return "♖" if self.color == "white" else "♜"
 
     def get_possible_moves(self) -> List[Position]:
-        # Move horizontally
-        possible_moves = []
-        for i in range(self.x + 1, 8):
-            if self.board[self.y][i] is None:
-                possible_moves.append(Position(i, self.y))
-            else:
-                if self.board[self.y][i].color != self.color:
-                    possible_moves.append(Position(i, self.y))
-                break
-        for i in range(self.x - 1, -1, -1):
-            if self.board[self.y][i] is None:
-                possible_moves.append(Position(i, self.y))
-            else:
-                if self.board[self.y][i].color != self.color:
-                    possible_moves.append(Position(i, self.y))
-                break
-        # Move vertically
-        for i in range(self.y + 1, 8):
-            if self.board[i][self.x] is None:
-                possible_moves.append(Position(self.x, i))
-            else:
-                if self.board[i][self.x].color != self.color:
-                    possible_moves.append(Position(self.x, i))
-                break
-        for i in range(self.y - 1, -1, -1):
-            if self.board[i][self.x] is None:
-                possible_moves.append(Position(self.x, i))
-            else:
-                if self.board[i][self.x].color != self.color:
-                    possible_moves.append(Position(self.x, i))
-                break
+        pass
 
 class Knight(ChessPiece):
     def __str__(self) -> str:
@@ -146,4 +99,3 @@ class Game:
 
 g = Game()
 g.print_board()
-

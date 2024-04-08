@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List
+from Chessboard import *
 
 @dataclass
 class Position:
@@ -27,8 +28,17 @@ class Pawn(Piece):
     def get_possible_moves(self) -> List[Position]:
         possible_moves = []
         if self.color == "white":
+            # ===== Case: White pawn is blocked by another piece =====
+            # if self.board[self.p.y + 1][self.p.x] is not None:
+            #     return possible_moves
+            # elif self.board[self.p.y + 1][self.p.x] is None:
+            #     possible_moves = []
+                
+            # ===== Case: White pawn is at the last row =====
             if self.p.y == 7:
                 possible_moves = []
+                
+            # ===== Case: White pawn is at the starting row =====
             elif self.p.y == 1:
                 # Move forward by 1 or 2 squares
                 possible_moves.append(Position(self.p.x, self.p.y + 1))
@@ -37,8 +47,11 @@ class Pawn(Piece):
                 # Move forward by 1 square
                 possible_moves.append(Position(self.p.x, self.p.y + 1))
         else:
+            # ===== Case: Black pawn is at the last row =====
             if self.p.y == 1:
                 possible_moves = []
+                
+            # ===== Case: Black pawn is at the starting row =====
             elif self.p.y == 6:
                 # Move forward by 1 or 2 squares
                 possible_moves.append(Position(self.p.x, self.p.y - 1))
