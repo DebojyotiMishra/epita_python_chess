@@ -163,3 +163,5 @@ class ChessboardFactory():
         
         self.board = board
 
+g = Game()
+g.print_board()
