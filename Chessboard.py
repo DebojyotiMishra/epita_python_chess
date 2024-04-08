@@ -72,3 +72,6 @@ class Game():
                     output += "  "
             output += "\n"
         print(output, end="")
+
+g = Game()
+g.print_board()
