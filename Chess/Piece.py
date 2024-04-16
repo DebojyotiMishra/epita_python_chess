@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List
-from Chessboard import Game
+from Chess.Chessboard import Game
 
 
 @dataclass
@@ -81,7 +81,8 @@ class Pawn(Piece):
                 empty_positions.append(p)
         
         return empty_positions
-    # TODO: check to see if it can take a piece on a diagonal
+    
+    # TODO: check to see if it can take a piece on a diagonal ✅
     # TODO: en passant
     # TODO: promotion
 
