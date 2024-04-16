@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List
-from Chessboard import *
+from Chessboard import Game
+
 
 @dataclass
 class Position:
@@ -12,54 +13,52 @@ class Position:
 class Piece(ABC):
     color: str
     p: Position
-        
+    g: 'Game' = None
+
     @abstractmethod
     def __str__(self) -> str:
         pass
 
     @abstractmethod
-    def get_possible_moves(self):
+    def get_possible_moves(self) -> list[Position]:
         pass
-    
+
+
+@dataclass
 class Pawn(Piece):
+    
     def __str__(self) -> str:
-        return "♙" if self.color == "white" else "♟"
-
-    def get_possible_moves(self) -> List[Position]:
-        possible_moves = []
+        return '♙' if self.color == "white" else '♟'
+    
+    def get_possible_moves(self) -> list[Position]:
+        positions = []
+        # Check if the piece is white
         if self.color == "white":
-            # ===== Case: White pawn is blocked by another piece =====
-            # if self.board[self.p.y + 1][self.p.x] is not None:
-            #     return possible_moves
-            # elif self.board[self.p.y + 1][self.p.x] is None:
-            #     possible_moves = []
-                
-            # ===== Case: White pawn is at the last row =====
-            if self.p.y == 7:
-                possible_moves = []
-                
-            # ===== Case: White pawn is at the starting row =====
-            elif self.p.y == 1:
-                # Move forward by 1 or 2 squares
-                possible_moves.append(Position(self.p.x, self.p.y + 1))
-                possible_moves.append(Position(self.p.x, self.p.y + 2))
+            # Check if the pawn is in its starting position
+            if self.p.y == 1 and self.g.board[self.p.y + 1][self.p.x] is None:
+                # Add two possible moves: one step forward and two steps forward
+                positions = [Position(self.p.x, self.p.y + 1), Position(self.p.x, self.p.y + 2)]
             else:
-                # Move forward by 1 square
-                possible_moves.append(Position(self.p.x, self.p.y + 1))
+                # Add one possible move: one step forward
+                positions = [Position(self.p.x, self.p.y + 1)]
         else:
-            # ===== Case: Black pawn is at the last row =====
-            if self.p.y == 1:
-                possible_moves = []
-                
-            # ===== Case: Black pawn is at the starting row =====
-            elif self.p.y == 6:
-                # Move forward by 1 or 2 squares
-                possible_moves.append(Position(self.p.x, self.p.y - 1))
-                possible_moves.append(Position(self.p.x, self.p.y - 2))
+            # Check if the pawn is in its starting position
+            if self.p.y == 6 and self.g.board[self.p.y - 1][self.p.x] is None:
+                # Add two possible moves: one step forward and two steps forward
+                positions = [Position(self.p.x, self.p.y - 1), Position(self.p.x, self.p.y - 2)]
             else:
-            # Move forward by 1 square
-                possible_moves.append(Position(self.p.x, self.p.y - 1))
-        return possible_moves
+                # Add one possible move: one step forward
+                positions = [Position(self.p.x, self.p.y - 1)]
+        
+        empty_positions = []
+        # Check if the positions are within the chessboard boundaries and if they are empty
+        for p in positions:
+            if not (0 <= p.x <= 7 and 0 <= p.y <= 7):
+                continue 
+            if self.g.board[p.y][p.x] is None:
+                empty_positions.append(p)
+        
+        return empty_positions
     # TODO: check to see if it can take a piece on a diagonal
     # TODO: en passant
     # TODO: promotion
