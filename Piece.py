@@ -39,9 +39,10 @@ class Pawn(Piece):
                 if self.g.board[self.p.y + 1][self.p.x] is None and self.g.board[self.p.y + 2][self.p.x] is None:
                     # Add two possible moves: one step forward and two steps forward
                     positions.extend([Position(self.p.x, self.p.y + 1), Position(self.p.x, self.p.y + 2)])
-                elif self.g.board[self.p.y + 1][self.p.x] is None:  # One square in front of the pawn is empty
-                    # Add one possible move: one step forward
-                    positions.append(Position(self.p.x, self.p.y + 1))
+                    
+            if self.g.board[self.p.y + 1][self.p.x] is None:  # One square in front of the pawn is empty
+                # Add one possible move: one step forward
+                positions.append(Position(self.p.x, self.p.y + 1))
                     
             # ==================== White Pawn Diagonal Capture Checks ====================
             # Check for captures on both diagonals
@@ -57,9 +58,10 @@ class Pawn(Piece):
                 if self.g.board[self.p.y - 1][self.p.x] is None and self.g.board[self.p.y - 2][self.p.x] is None:
                     # Add two possible moves: one step forward and two steps forward
                     positions.extend([Position(self.p.x, self.p.y - 1), Position(self.p.x, self.p.y - 2)])
-                elif self.g.board[self.p.y - 1][self.p.x] is None:
-                    # Add one possible moves: one step forward
-                    positions.append(Position(self.p.x, self.p.y - 1))
+                    
+            if self.g.board[self.p.y - 1][self.p.x] is None:
+                # Add one possible moves: one step forward
+                positions.append(Position(self.p.x, self.p.y - 1))
             
             # ==================== Black Pawn Diagonal Capture Checks ====================
             # Check for captures on both diagonals
