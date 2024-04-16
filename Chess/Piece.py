@@ -52,12 +52,15 @@ class Pawn(Piece):
                     # Add one possible move: one step forward
                     positions.append(Position(self.p.x, self.p.y + 1))
 
-            if self.p.y != 1:
+            if self.p.y != 1 and self.p.y < 7:
                 if (
                     self.g.board[self.p.y + 1][self.p.x] is None
                 ):  # One square in front of the pawn is empty
                     # Add one possible move: one step forward
                     positions.append(Position(self.p.x, self.p.y + 1))
+
+            if self.p.y == 7:
+                positions = []
 
             # ==================== White Pawn Diagonal Capture Checks ====================
             # Check for captures on both diagonals
@@ -85,7 +88,7 @@ class Pawn(Piece):
                     # Add one possible move: one step forward
                     positions.append(Position(self.p.x, self.p.y - 1))
 
-            if self.p.y != 6:
+            if self.p.y != 6 and self.p.y > 0:
                 if self.g.board[self.p.y - 1][self.p.x] is None:
                     # Add one possible moves: one step forward
                     positions.append(Position(self.p.x, self.p.y - 1))
