@@ -35,20 +35,40 @@ class Pawn(Piece):
         # Check if the piece is white
         if self.color == "white":
             # Check if the pawn is in its starting position
-            if self.p.y == 1 and self.g.board[self.p.y + 1][self.p.x] is None:
-                # Add two possible moves: one step forward and two steps forward
-                positions = [Position(self.p.x, self.p.y + 1), Position(self.p.x, self.p.y + 2)]
-            else:
-                # Add one possible move: one step forward
-                positions = [Position(self.p.x, self.p.y + 1)]
+            if self.p.y == 1:
+                if self.g.board[self.p.y + 1][self.p.x] is None and self.g.board[self.p.y + 2][self.p.x] is None:
+                    # Add two possible moves: one step forward and two steps forward
+                    positions.extend([Position(self.p.x, self.p.y + 1), Position(self.p.x, self.p.y + 2)])
+                elif self.g.board[self.p.y + 1][self.p.x] is None:  # One square in front of the pawn is empty
+                    # Add one possible move: one step forward
+                    positions.append(Position(self.p.x, self.p.y + 1))
+                    
+            # ==================== White Pawn Diagonal Capture Checks ====================
+            # Check for captures on both diagonals
+            for dx in [-1, 1]:
+                x = self.p.x + dx
+                y = self.p.y + 1
+                if 0 <= x < 8 and 0 <= y < 8 and self.g.board[y][x] is not None:
+                    positions.append(Position(x, y))
+                
         else:
             # Check if the pawn is in its starting position
-            if self.p.y == 6 and self.g.board[self.p.y - 1][self.p.x] is None:
-                # Add two possible moves: one step forward and two steps forward
-                positions = [Position(self.p.x, self.p.y - 1), Position(self.p.x, self.p.y - 2)]
-            else:
-                # Add one possible move: one step forward
-                positions = [Position(self.p.x, self.p.y - 1)]
+            if self.p.y == 6:
+                if self.g.board[self.p.y - 1][self.p.x] is None and self.g.board[self.p.y - 2][self.p.x] is None:
+                    # Add two possible moves: one step forward and two steps forward
+                    positions.extend([Position(self.p.x, self.p.y - 1), Position(self.p.x, self.p.y - 2)])
+                elif self.g.board[self.p.y - 1][self.p.x] is None:
+                    # Add one possible moves: one step forward
+                    positions.append(Position(self.p.x, self.p.y - 1))
+            
+            # ==================== Black Pawn Diagonal Capture Checks ====================
+            # Check for captures on both diagonals
+            for dx in [-1, 1]:
+                x = self.p.x + dx
+                y = self.p.y - 1
+                if 0 <= x < 8 and 0 <= y < 8 and self.g.board[y][x] is not None:
+                    positions.append(Position(x, y))
+
         
         empty_positions = []
         # Check if the positions are within the chessboard boundaries and if they are empty
