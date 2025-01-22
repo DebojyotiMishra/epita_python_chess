@@ -160,3 +160,52 @@ The following board will be displayed on the terminal:
 And the Board SVG is updated as well:
 <br>
 <img src='readme-images/Group 16.png' width='70%'>
+
+## Recent Updates
+
+### Game Mechanics
+- **En Passant**: Implemented the en passant capture rule for pawns
+- **Castling**: Enhanced castling logic with proper validation:
+  - Prevents castling through check
+  - Prevents castling while in check
+  - Validates that neither king nor rook has moved previously
+  - Ensures path between king and rook is clear
+- **Check Prevention**: Added validation to prevent moves that would put or leave own king in check
+- **Turn Management**: Implemented proper turn alternation between white and black players
+
+### Move Validation Improvements
+- Enhanced pawn movement validation
+- Added boundary checks for all piece movements
+- Improved diagonal capture logic for pawns
+- Added state tracking for special moves (en passant, castling)
+
+### Game State Management
+- Added move history logging with:
+  - Piece type
+  - Piece color
+  - Start position
+  - End position
+  - Captured piece information
+- Implemented proper piece state tracking:
+  - Pawn first move status
+  - En passant vulnerability
+  - Rook and king movement history for castling
+
+### Code Quality
+- Improved code organization and readability
+- Enhanced error handling and input validation
+- Added proper type hints and documentation
+- Implemented consistent state management across all piece types
+
+## Planned Features
+- Choice of promotion pieces for pawns (currently defaults to Queen)
+- Additional draw conditions:
+  - Threefold repetition
+  - Fifty-move rule
+  - Insufficient material
+- Move notation export/import
+- Game state serialization
+
+## Usage
+
+[Previous usage instructions remain unchanged...]
