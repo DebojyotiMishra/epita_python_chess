@@ -64,6 +64,7 @@ class Game:
                         piece.game = self
 
         self.move_log = []
+        self.current_turn = "white"
 
     def print_board(self) -> None:
         for row in self.board:
@@ -131,31 +132,35 @@ class Game:
             raise ValueError("Invalid move")
 
     def make_move(self, start: Position, end: Position) -> None:
-        if not (
-            0 <= start.x < 8 and 0 <= start.y < 8 and 0 <= end.x < 8 and 0 <= end.y < 8
-        ):
-            raise ValueError("Invalid start position")
+        if not (0 <= start.x < 8 and 0 <= start.y < 8 and 0 <= end.x < 8 and 0 <= end.y < 8):
+            raise ValueError("Invalid position")
 
         piece = self.board[start.y][start.x]
-
         if piece is None:
             raise ValueError("No piece at start position")
+            
+        if piece.color != self.current_turn:
+            raise ValueError("Not your turn")
 
         valid_moves = piece.get_possible_moves()
-
         if end not in valid_moves:
             raise ValueError("Invalid move")
 
-        if isinstance(piece, King):
-            # checking if king can move to a square or not (if it would be in check or checkmate in the end position)
-            copy_game = copy.deepcopy(self)
-            copy_game.make_move(start, end)
-            if copy_game.is_check(piece.color):
-                raise ValueError("Invalid move")
-
-        self.board[end.y][end.x] = piece
-        self.board[start.y][start.x] = None
-        piece.position = end
+        # Make the move
+        captured_piece = self.board[end.y][end.x]
+        piece.move(end)
+        
+        # Log the move
+        self.move_log.append({
+            'piece': piece.asText(),
+            'color': piece.color,
+            'start': start,
+            'end': end,
+            'captured': captured_piece.asText() if captured_piece else None
+        })
+        
+        # Switch turns
+        self.current_turn = "black" if self.current_turn == "white" else "white"
 
     def is_valid_move(self, start: Position, end: Position) -> bool:
         if not (
@@ -291,37 +296,3 @@ if __name__ == "__main__":
     svg_content = game.to_svg()
     with open("chessboard.svg", "w") as f:
         f.write(svg_content)
-
-
-{
-    "time": {
-        "updated": "May 5, 2024 09:16:42 UTC",
-        "updatedISO": "2024-05-05T09:16:42+00:00",
-        "updateduk": "May 5, 2024 at 10:16 BST",
-    },
-    "disclaimer": "This data was produced from the CoinDesk Bitcoin Price Index (USD). Non-USD currency data converted using hourly conversion rate from openexchangerates.org",
-    "chartName": "Bitcoin",
-    "bpi": {
-        "USD": {
-            "code": "USD",
-            "symbol": "&#36;",
-            "rate": "63,712.472",
-            "description": "United States Dollar",
-            "rate_float": 63712.4717,
-        },
-        "GBP": {
-            "code": "GBP",
-            "symbol": "&pound;",
-            "rate": "50,775.017",
-            "description": "British Pound Sterling",
-            "rate_float": 50775.0172,
-        },
-        "EUR": {
-            "code": "EUR",
-            "symbol": "&euro;",
-            "rate": "59,141.994",
-            "description": "Euro",
-            "rate_float": 59141.9938,
-        },
-    },
-}
