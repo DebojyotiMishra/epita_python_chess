@@ -65,29 +65,35 @@ class Pawn(Piece):
                         if self.game.board[self.position.y + 2][self.position.x] is None:
                             possible_moves.append(Position(self.position.x, self.position.y + 2))
             
-            # Diagonal captures
-            if self.position.y + 1 < 8:
-                # Right diagonal
+            # Diagonal captures and en passant
+            if self.position.y < 7:  # Can capture forward
+                # Right diagonal capture
                 if self.position.x + 1 < 8:
+                    # Normal capture
                     target = self.game.board[self.position.y + 1][self.position.x + 1]
                     if target is not None and target.color != self.color:
                         possible_moves.append(Position(self.position.x + 1, self.position.y + 1))
+                    # En passant
+                    if self.position.y == 4:  # White pawns can only en passant from rank 5
+                        target = self.game.board[self.position.y][self.position.x + 1]
+                        if (isinstance(target, Pawn) and 
+                            target.color != self.color and 
+                            target.en_passant_vulnerable):
+                            possible_moves.append(Position(self.position.x + 1, self.position.y + 1))
                 
-                # Left diagonal
+                # Left diagonal capture
                 if self.position.x - 1 >= 0:
+                    # Normal capture
                     target = self.game.board[self.position.y + 1][self.position.x - 1]
                     if target is not None and target.color != self.color:
                         possible_moves.append(Position(self.position.x - 1, self.position.y + 1))
-                
-                # En passant
-                if self.position.y == 4:  # White pawns can only en passant from rank 5
-                    for dx in [-1, 1]:
-                        if 0 <= self.position.x + dx < 8:
-                            target = self.game.board[self.position.y][self.position.x + dx]
-                            if (isinstance(target, Pawn) and 
-                                target.color != self.color and 
-                                target.en_passant_vulnerable):
-                                possible_moves.append(Position(self.position.x + dx, self.position.y + 1))
+                    # En passant
+                    if self.position.y == 4:  # White pawns can only en passant from rank 5
+                        target = self.game.board[self.position.y][self.position.x - 1]
+                        if (isinstance(target, Pawn) and 
+                            target.color != self.color and 
+                            target.en_passant_vulnerable):
+                            possible_moves.append(Position(self.position.x - 1, self.position.y + 1))
 
         else:  # Black pawn
             # Normal moves
@@ -99,29 +105,35 @@ class Pawn(Piece):
                         if self.game.board[self.position.y - 2][self.position.x] is None:
                             possible_moves.append(Position(self.position.x, self.position.y - 2))
             
-            # Diagonal captures
-            if self.position.y - 1 >= 0:
-                # Right diagonal
+            # Diagonal captures and en passant
+            if self.position.y > 0:  # Can capture forward
+                # Right diagonal capture
                 if self.position.x + 1 < 8:
+                    # Normal capture
                     target = self.game.board[self.position.y - 1][self.position.x + 1]
                     if target is not None and target.color != self.color:
                         possible_moves.append(Position(self.position.x + 1, self.position.y - 1))
+                    # En passant
+                    if self.position.y == 3:  # Black pawns can only en passant from rank 4
+                        target = self.game.board[self.position.y][self.position.x + 1]
+                        if (isinstance(target, Pawn) and 
+                            target.color != self.color and 
+                            target.en_passant_vulnerable):
+                            possible_moves.append(Position(self.position.x + 1, self.position.y - 1))
                 
-                # Left diagonal
+                # Left diagonal capture
                 if self.position.x - 1 >= 0:
+                    # Normal capture
                     target = self.game.board[self.position.y - 1][self.position.x - 1]
                     if target is not None and target.color != self.color:
                         possible_moves.append(Position(self.position.x - 1, self.position.y - 1))
-                
-                # En passant
-                if self.position.y == 3:  # Black pawns can only en passant from rank 4
-                    for dx in [-1, 1]:
-                        if 0 <= self.position.x + dx < 8:
-                            target = self.game.board[self.position.y][self.position.x + dx]
-                            if (isinstance(target, Pawn) and 
-                                target.color != self.color and 
-                                target.en_passant_vulnerable):
-                                possible_moves.append(Position(self.position.x + dx, self.position.y - 1))
+                    # En passant
+                    if self.position.y == 3:  # Black pawns can only en passant from rank 4
+                        target = self.game.board[self.position.y][self.position.x - 1]
+                        if (isinstance(target, Pawn) and 
+                            target.color != self.color and 
+                            target.en_passant_vulnerable):
+                            possible_moves.append(Position(self.position.x - 1, self.position.y - 1))
 
         # Filter moves that would put own king in check
         possible_moves = [move for move in possible_moves if not self._would_be_in_check(move)]
