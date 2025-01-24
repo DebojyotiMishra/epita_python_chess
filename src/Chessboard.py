@@ -181,19 +181,87 @@ class Game:
         return True
 
     def is_check(self, color: str) -> bool:
-        # Find the position of the king
-        for row in self.board:
-            for piece in row:
+        """Check if the king of the given color is in check."""
+        # Find the king's position
+        king_pos = None
+        for y in range(8):
+            for x in range(8):
+                piece = self.board[y][x]
                 if isinstance(piece, King) and piece.color == color:
-                    king_position = piece.position
+                    king_pos = Position(x, y)
                     break
+            if king_pos:
+                break
+            
+        if not king_pos:
+            return False
 
         # Check if any opponent piece can attack the king
-        for row in self.board:
-            for piece in row:
-                if isinstance(piece, Piece) and piece.color != color:
-                    valid_moves = piece.get_possible_moves()
-                    if king_position in valid_moves:
+        for y in range(8):
+            for x in range(8):
+                piece = self.board[y][x]
+                if piece is None or piece.color == color:
+                    continue
+
+                # Pawn attacks
+                if isinstance(piece, Pawn):
+                    if piece.color == "white":
+                        if (piece.position.y + 1 == king_pos.y and 
+                            abs(piece.position.x - king_pos.x) == 1):
+                            return True
+                    else:
+                        if (piece.position.y - 1 == king_pos.y and 
+                            abs(piece.position.x - king_pos.x) == 1):
+                            return True
+                    continue
+
+                # Knight attacks
+                if isinstance(piece, Knight):
+                    dx = abs(piece.position.x - king_pos.x)
+                    dy = abs(piece.position.y - king_pos.y)
+                    if (dx == 2 and dy == 1) or (dx == 1 and dy == 2):
+                        return True
+                    continue
+
+                # For other pieces, check if there's a clear path
+                dx = king_pos.x - piece.position.x
+                dy = king_pos.y - piece.position.y
+
+                # Rook-like movements (horizontal/vertical)
+                if isinstance(piece, (Rook, Queen)):
+                    if dx == 0 or dy == 0:
+                        step_x = 0 if dx == 0 else dx // abs(dx)
+                        step_y = 0 if dy == 0 else dy // abs(dy)
+                        x, y = piece.position.x + step_x, piece.position.y + step_y
+                        clear_path = True
+                        while (x, y) != (king_pos.x, king_pos.y):
+                            if self.board[y][x] is not None:
+                                clear_path = False
+                                break
+                            x += step_x
+                            y += step_y
+                        if clear_path:
+                            return True
+
+                # Bishop-like movements (diagonal)
+                if isinstance(piece, (Bishop, Queen)):
+                    if abs(dx) == abs(dy):
+                        step_x = dx // abs(dx)
+                        step_y = dy // abs(dy)
+                        x, y = piece.position.x + step_x, piece.position.y + step_y
+                        clear_path = True
+                        while (x, y) != (king_pos.x, king_pos.y):
+                            if self.board[y][x] is not None:
+                                clear_path = False
+                                break
+                            x += step_x
+                            y += step_y
+                        if clear_path:
+                            return True
+
+                # King attacks (one square in any direction)
+                if isinstance(piece, King):
+                    if abs(dx) <= 1 and abs(dy) <= 1:
                         return True
 
         return False
@@ -217,9 +285,15 @@ class Game:
         return True
 
     def is_stalemate(self, color: str) -> bool:
+        """Check if the given color is in stalemate."""
         if self.is_check(color):
             return False
 
+        # Save original turn
+        original_turn = self.current_turn
+        self.current_turn = color  # Temporarily set turn to check moves
+
+        has_valid_moves = False
         for row in self.board:
             for piece in row:
                 if isinstance(piece, Piece) and piece.color == color:
@@ -227,15 +301,27 @@ class Game:
                     for move in valid_moves:
                         # Make a copy of the game and simulate the move
                         copy_game = copy.deepcopy(self)
-                        copy_game.make_move(piece.position, move)
-                        # Check if the opponent's king is still in check after the move
-                        if not copy_game.is_check(color):
-                            return False
+                        copy_game.current_turn = color  # Set correct turn in copy
+                        try:
+                            copy_game.make_move(piece.position, move)
+                            if not copy_game.is_check(color):
+                                has_valid_moves = True
+                                break
+                        except ValueError:
+                            continue
+                if has_valid_moves:
+                    break
+            if has_valid_moves:
+                break
 
-        return True
+        # Restore original turn
+        self.current_turn = original_turn
+        return not has_valid_moves
 
     def is_draw(self) -> bool:
-        return self.is_stalemate("white") or self.is_stalemate("black")
+        """Check if the game is a draw."""
+        return (self.is_stalemate("white") or 
+                self.is_stalemate("black"))
 
     def to_svg(self) -> str:
         dwg = svgwrite.Drawing(profile="tiny", size=("450px", "450px"))
@@ -296,3 +382,4 @@ if __name__ == "__main__":
     svg_content = game.to_svg()
     with open("chessboard.svg", "w") as f:
         f.write(svg_content)
+        

@@ -405,43 +405,105 @@ class King(Piece):
         if not hasattr(self, 'has_moved'):
             self.has_moved = False
             
-        if not self.has_moved and not self.game.is_check(self.color):
-            # Kingside castling
-            if (self.position.x == 4 and 
-                (self.position.y == 0 if self.color == "white" else self.position.y == 7)):
-                if (self.game.board[self.position.y][7] is not None and 
-                    isinstance(self.game.board[self.position.y][7], Rook) and
-                    not getattr(self.game.board[self.position.y][7], 'has_moved', True)):
-                    if (self.game.board[self.position.y][5] is None and 
-                        self.game.board[self.position.y][6] is None):
-                        # Check if squares are under attack
-                        if (not self._would_square_be_attacked(Position(5, self.position.y)) and
-                            not self._would_square_be_attacked(Position(6, self.position.y))):
-                            possible_moves.append(Position(6, self.position.y))
+        if not self.has_moved:
+            # Only check castling if the king is not in check
+            king_pos = Position(self.position.x, self.position.y)
+            if not self._would_square_be_attacked(king_pos):
+                # Kingside castling
+                if (self.position.x == 4 and 
+                    (self.position.y == 0 if self.color == "white" else self.position.y == 7)):
+                    if (self.game.board[self.position.y][7] is not None and 
+                        isinstance(self.game.board[self.position.y][7], Rook) and
+                        not getattr(self.game.board[self.position.y][7], 'has_moved', True)):
+                        if (self.game.board[self.position.y][5] is None and 
+                            self.game.board[self.position.y][6] is None):
+                            # Check if squares are under attack
+                            if (not self._would_square_be_attacked(Position(5, self.position.y)) and
+                                not self._would_square_be_attacked(Position(6, self.position.y))):
+                                possible_moves.append(Position(6, self.position.y))
                         
-            # Queenside castling
-            if (self.position.x == 4 and 
-                (self.position.y == 0 if self.color == "white" else self.position.y == 7)):
-                if (self.game.board[self.position.y][0] is not None and 
-                    isinstance(self.game.board[self.position.y][0], Rook) and
-                    not getattr(self.game.board[self.position.y][0], 'has_moved', True)):
-                    if (self.game.board[self.position.y][1] is None and 
-                        self.game.board[self.position.y][2] is None and
-                        self.game.board[self.position.y][3] is None):
-                        # Check if squares are under attack
-                        if (not self._would_square_be_attacked(Position(2, self.position.y)) and
-                            not self._would_square_be_attacked(Position(3, self.position.y))):
-                            possible_moves.append(Position(2, self.position.y))
+                # Queenside castling
+                if (self.position.x == 4 and 
+                    (self.position.y == 0 if self.color == "white" else self.position.y == 7)):
+                    if (self.game.board[self.position.y][0] is not None and 
+                        isinstance(self.game.board[self.position.y][0], Rook) and
+                        not getattr(self.game.board[self.position.y][0], 'has_moved', True)):
+                        if (self.game.board[self.position.y][1] is None and 
+                            self.game.board[self.position.y][2] is None and
+                            self.game.board[self.position.y][3] is None):
+                            # Check if squares are under attack
+                            if (not self._would_square_be_attacked(Position(2, self.position.y)) and
+                                not self._would_square_be_attacked(Position(3, self.position.y))):
+                                possible_moves.append(Position(2, self.position.y))
                 
         return sorted(possible_moves, key=lambda pos: (pos.x, pos.y))
 
     def _would_square_be_attacked(self, pos: Position) -> bool:
-        # Check if a square would be attacked by any opponent piece
+        """Check if a square would be attacked by any opponent piece without recursion"""
         for row in self.game.board:
             for piece in row:
                 if piece is not None and piece.color != self.color:
-                    if pos in piece.get_possible_moves():
-                        return True
+                    # For pawns, check their attack pattern directly
+                    if isinstance(piece, Pawn):
+                        if piece.color == "white":
+                            if (piece.position.y + 1 == pos.y and 
+                                abs(piece.position.x - pos.x) == 1):
+                                return True
+                        else:
+                            if (piece.position.y - 1 == pos.y and 
+                                abs(piece.position.x - pos.x) == 1):
+                                return True
+                        continue
+
+                    # For knights, check their movement pattern directly
+                    if isinstance(piece, Knight):
+                        dx = abs(piece.position.x - pos.x)
+                        dy = abs(piece.position.y - pos.y)
+                        if (dx == 2 and dy == 1) or (dx == 1 and dy == 2):
+                            return True
+                        continue
+
+                    # For other pieces, check if there's a clear path
+                    dx = pos.x - piece.position.x
+                    dy = pos.y - piece.position.y
+
+                    # Rook-like movements (horizontal/vertical)
+                    if isinstance(piece, (Rook, Queen)):
+                        if dx == 0 or dy == 0:
+                            step_x = 0 if dx == 0 else dx // abs(dx)
+                            step_y = 0 if dy == 0 else dy // abs(dy)
+                            x, y = piece.position.x + step_x, piece.position.y + step_y
+                            clear_path = True
+                            while (x, y) != (pos.x, pos.y):
+                                if self.game.board[y][x] is not None:
+                                    clear_path = False
+                                    break
+                                x += step_x
+                                y += step_y
+                            if clear_path:
+                                return True
+
+                    # Bishop-like movements (diagonal)
+                    if isinstance(piece, (Bishop, Queen)):
+                        if abs(dx) == abs(dy):
+                            step_x = dx // abs(dx)
+                            step_y = dy // abs(dy)
+                            x, y = piece.position.x + step_x, piece.position.y + step_y
+                            clear_path = True
+                            while (x, y) != (pos.x, pos.y):
+                                if self.game.board[y][x] is not None:
+                                    clear_path = False
+                                    break
+                                x += step_x
+                                y += step_y
+                            if clear_path:
+                                return True
+
+                    # King attacks (one square in any direction)
+                    if isinstance(piece, King):
+                        if abs(dx) <= 1 and abs(dy) <= 1:
+                            return True
+
         return False
 
     def move(self, end: Position) -> None:
